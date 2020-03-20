@@ -1,6 +1,9 @@
 const express = require('express');
 
 const Projects = require('./projectsHelper.js');
+const Resources = require("../resources/resourcesHelper")
+const Tasks = require("../tasks/tasksHelper")
+const Project_resources = require("../project_resources/project_resourcesHelper")
 
 const router = express.Router();
 
@@ -30,10 +33,26 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.get('/:id/steps', (req, res) => {
+router.get('/:id/Resources', (req, res) => {
   const { id } = req.params;
 
-  Projects.findSteps(id)
+  Projects.findResources(id)
+    .then(steps => {
+      if (steps.length) {
+        res.json(steps);
+      } else {
+        res.status(404).json({ message: 'Could not find steps for given project' })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Failed to get steps' });
+    });
+});
+
+router.get('/:id/Tasks', (req, res) => {
+  const { id } = req.params;
+
+  Projects.findTasks(id)
     .then(steps => {
       if (steps.length) {
         res.json(steps);
@@ -58,19 +77,51 @@ router.post('/', (req, res) => {
     });
 });
 
-router.post('/:id/steps', (req, res) => {
-  const stepData = req.body;
+//checked until here
+
+router.post('/:id/resources', (req, res) => {
+  const resourceData = req.body;
   const { id } = req.params;
 
   Projects.findById(id)
     .then(project => {
       if (project) {
-        Projects.addStep(stepData, id)
-          .then(step => {
-            res.status(201).json(step);
+        Resources.add(resourceData)
+          .then(resource => {
+            const pairData = {
+              project_id: id,
+              resource_id: resource.id
+            }
+            Project_resources.add(pairData)
+              .then(pair => {
+                res.status(201).json(resource)
+              })
           })
       } else {
         res.status(404).json({ message: 'Could not find project with given id.' })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Failed to create new step' });
+    });
+});
+
+router.post('/:id/tasks', (req, res) => {
+  const { id } = req.params;
+  const taskData = {
+    ...req.body,
+    project_id: req.params.id
+  };
+
+  Resources.findById(id)
+    .then(resource => {
+      if (resource) {
+        Tasks.add(taskData)
+          .then(task => {
+            res.status(201).json(task);
+          })
+      } else {
+        res.status(404).json({ message: 'Could not find resource with given id.' })
       }
     })
     .catch(err => {
