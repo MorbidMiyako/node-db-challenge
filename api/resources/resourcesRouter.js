@@ -1,44 +1,47 @@
 const express = require('express');
 
-const Resources = require('./resourcesHelper.js');
+const Projects = require('../projects/projectsHelper');
+const Resources = require("./resourcesHelper")
+const Tasks = require("../tasks/tasksHelper")
+const Project_resources = require("../project_resources/project_resourcesHelper")
 
 const router = express.Router();
 
 router.get('/', (req, res) => {
   Resources.find()
-    .then(resources => {
-      res.json(resources);
+    .then(projects => {
+      res.json(projects);
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to get resources' });
+      res.status(500).json({ message: 'Failed to get projects' });
     });
-});
+}); // checked
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
 
   Resources.findById(id)
-    .then(resource => {
-      if (resource) {
-        res.json(resource);
+    .then(project => {
+      if (project) {
+        res.json(project);
       } else {
-        res.status(404).json({ message: 'Could not find resource with given id.' })
+        res.status(404).json({ message: 'Could not find project with given id.' })
       }
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to get resources' });
+      res.status(500).json({ message: 'Failed to get projects' });
     });
 });
 
-router.get('/:id/steps', (req, res) => {
+router.get('/:id/Projects', (req, res) => {
   const { id } = req.params;
 
-  Resources.findSteps(id)
+  Resources.findProjects(id)
     .then(steps => {
       if (steps.length) {
         res.json(steps);
       } else {
-        res.status(404).json({ message: 'Could not find steps for given resource' })
+        res.status(404).json({ message: 'Could not find steps for given project' })
       }
     })
     .catch(err => {
@@ -49,28 +52,39 @@ router.get('/:id/steps', (req, res) => {
 router.post('/', (req, res) => {
   const resourceData = req.body;
 
+  console.log(resourceData)
+
   Resources.add(resourceData)
     .then(resource => {
       res.status(201).json(resource);
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to create new resource' });
+      res.status(500).json({ ...err, message: 'Failed to create new resource' });
     });
-});
+}); // fix this????
 
-router.post('/:id/steps', (req, res) => {
-  const stepData = req.body;
+// update after this later
+
+router.post('/:id/projects', (req, res) => {
+  const resourceData = req.body;
   const { id } = req.params;
 
   Resources.findById(id)
-    .then(resource => {
-      if (resource) {
-        Resources.addStep(stepData, id)
-          .then(step => {
-            res.status(201).json(step);
+    .then(project => {
+      if (project) {
+        Projects.add(resourceData)
+          .then(resource => {
+            const pairData = {
+              project_id: id,
+              resource_id: resource.id
+            }
+            Project_resources.add(pairData)
+              .then(pair => {
+                res.status(201).json(resource)
+              })
           })
       } else {
-        res.status(404).json({ message: 'Could not find resource with given id.' })
+        res.status(404).json({ message: 'Could not find project with given id.' })
       }
     })
     .catch(err => {
@@ -83,18 +97,18 @@ router.put('/:id', (req, res) => {
   const changes = req.body;
 
   Resources.findById(id)
-    .then(resource => {
-      if (resource) {
+    .then(project => {
+      if (project) {
         Resources.update(changes, id)
           .then(updatedScheme => {
             res.json(updatedScheme);
           });
       } else {
-        res.status(404).json({ message: 'Could not find resource with given id' });
+        res.status(404).json({ message: 'Could not find project with given id' });
       }
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to update resource' });
+      res.status(500).json({ message: 'Failed to update project' });
     });
 });
 
@@ -106,11 +120,11 @@ router.delete('/:id', (req, res) => {
       if (deleted) {
         res.json({ removed: deleted });
       } else {
-        res.status(404).json({ message: 'Could not find resource with given id' });
+        res.status(404).json({ message: 'Could not find project with given id' });
       }
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to delete resource' });
+      res.status(500).json({ message: 'Failed to delete project' });
     });
 });
 

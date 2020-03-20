@@ -7,6 +7,9 @@ const Project_resources = require("../project_resources/project_resourcesHelper"
 
 const router = express.Router();
 
+// post resources with id needs to be fixed
+
+
 router.get('/', (req, res) => {
   Projects.find()
     .then(projects => {
@@ -52,16 +55,64 @@ router.get('/:id/Resources', (req, res) => {
 router.get('/:id/Tasks', (req, res) => {
   const { id } = req.params;
 
-  Projects.findTasks(id)
-    .then(steps => {
-      if (steps.length) {
-        res.json(steps);
+  Projects.findById(id)
+    .then(project => {
+      if (project) {
+        Projects.findTasks(id)
+          .then(steps => {
+            if (steps.length) {
+              res.json({ ...project, steps: { ...steps } });
+            } else {
+              res.status(404).json({ message: 'Could not find steps for given project' })
+            }
+          })
+          .catch(err => {
+            res.status(500).json({ message: 'Failed to get steps' });
+          });
+
       } else {
-        res.status(404).json({ message: 'Could not find steps for given project' })
+        res.status(404).json({ message: 'Could not find project with given id.' })
       }
     })
     .catch(err => {
-      res.status(500).json({ message: 'Failed to get steps' });
+      res.status(500).json({ message: 'Failed to get projects' });
+    });
+});
+
+router.get('/:id/All', (req, res) => {
+  const { id } = req.params;
+
+  Projects.findById(id)
+    .then(project => {
+      if (project) {
+        Projects.findTasks(id)
+          .then(steps => {
+            if (steps.length) {
+              Projects.findResources(id)
+                .then(resources => {
+                  if (resources.length) {
+                    res.json({ ...project, steps: { ...steps }, resources: { ...resources } });
+                  } else {
+                    res.status(404).json({ message: 'Could not find steps for given project' })
+                  }
+                })
+                .catch(err => {
+                  res.status(500).json({ message: 'Failed to get steps' });
+                });
+            } else {
+              res.status(404).json({ message: 'Could not find steps for given project' })
+            }
+          })
+          .catch(err => {
+            res.status(500).json({ message: 'Failed to get steps' });
+          });
+
+      } else {
+        res.status(404).json({ message: 'Could not find project with given id.' })
+      }
+    })
+    .catch(err => {
+      res.status(500).json({ message: 'Failed to get projects' });
     });
 });
 
@@ -87,15 +138,18 @@ router.post('/:id/resources', (req, res) => {
     .then(project => {
       if (project) {
         Resources.add(resourceData)
-          .then(resource => {
-            const pairData = {
-              project_id: id,
-              resource_id: resource.id
-            }
-            Project_resources.add(pairData)
-              .then(pair => {
-                res.status(201).json(resource)
-              })
+          .then(id => {
+            // console.log(resource)
+            // Project_resources.add(pairData)
+            //   .then(pair => {
+            res.status(200).json(resource)
+          })
+          // .catch(err => {
+          //   res.status(500).json({ err, message: "failed to pair resource" })
+          // })
+          // })
+          .catch(err => {
+            res.status(500).json({ err, message: "failed to add resource" })
           })
       } else {
         res.status(404).json({ message: 'Could not find project with given id.' })
@@ -104,7 +158,7 @@ router.post('/:id/resources', (req, res) => {
     .catch(err => {
       res.status(500).json({ message: 'Failed to create new step' });
     });
-});
+}); // needs fixing
 
 router.post('/:id/tasks', (req, res) => {
   const { id } = req.params;

@@ -17,7 +17,7 @@ function findById(id) {
 }
 
 function add(taskData) {
-  return db("tasks").insert({ taskData })
+  return db("tasks").insert(taskData)
 }
 
 function update(changes, id) {
@@ -27,6 +27,6 @@ function update(changes, id) {
 }
 
 function remove(id) {
-  return db("projects").where("id", "=", id).del()
+  return db("tasks").where("id", "=", id).del()
 }
 

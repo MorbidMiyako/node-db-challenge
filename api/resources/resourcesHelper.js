@@ -26,7 +26,8 @@ function findProjects(id) {
 
 
 function add(resourceData) {
-  return db("resources").insert({ resourceData })
+  console.log(resourceData)
+  return db("resources").insert(resourceData)
 }
 
 function update(changes, id) {

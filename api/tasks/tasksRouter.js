@@ -30,22 +30,6 @@ router.get('/:id', (req, res) => {
     });
 });
 
-router.get('/:id/steps', (req, res) => {
-  const { id } = req.params;
-
-  Tasks.findSteps(id)
-    .then(steps => {
-      if (steps.length) {
-        res.json(steps);
-      } else {
-        res.status(404).json({ message: 'Could not find steps for given task' })
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: 'Failed to get steps' });
-    });
-});
-
 router.post('/', (req, res) => {
   const taskData = req.body;
 
@@ -55,26 +39,6 @@ router.post('/', (req, res) => {
     })
     .catch(err => {
       res.status(500).json({ message: 'Failed to create new task' });
-    });
-});
-
-router.post('/:id/steps', (req, res) => {
-  const stepData = req.body;
-  const { id } = req.params;
-
-  Tasks.findById(id)
-    .then(task => {
-      if (task) {
-        Tasks.addStep(stepData, id)
-          .then(step => {
-            res.status(201).json(step);
-          })
-      } else {
-        res.status(404).json({ message: 'Could not find task with given id.' })
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: 'Failed to create new step' });
     });
 });
 
