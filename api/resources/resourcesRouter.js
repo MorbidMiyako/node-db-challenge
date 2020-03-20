@@ -15,7 +15,7 @@ router.get('/', (req, res) => {
     .catch(err => {
       res.status(500).json({ message: 'Failed to get projects' });
     });
-}); // checked
+});
 
 router.get('/:id', (req, res) => {
   const { id } = req.params;
@@ -61,36 +61,35 @@ router.post('/', (req, res) => {
     .catch(err => {
       res.status(500).json({ ...err, message: 'Failed to create new resource' });
     });
-}); // fix this????
-
-// update after this later
-
-router.post('/:id/projects', (req, res) => {
-  const resourceData = req.body;
-  const { id } = req.params;
-
-  Resources.findById(id)
-    .then(project => {
-      if (project) {
-        Projects.add(resourceData)
-          .then(resource => {
-            const pairData = {
-              project_id: id,
-              resource_id: resource.id
-            }
-            Project_resources.add(pairData)
-              .then(pair => {
-                res.status(201).json(resource)
-              })
-          })
-      } else {
-        res.status(404).json({ message: 'Could not find project with given id.' })
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: 'Failed to create new step' });
-    });
 });
+
+
+// router.post('/:id/projects', (req, res) => {
+//   const resourceData = req.body;
+//   const { id } = req.params;
+
+//   Resources.findById(id)
+//     .then(project => {
+//       if (project) {
+//         Projects.add(resourceData)
+//           .then(resource => {
+//             const pairData = {
+//               project_id: id,
+//               resource_id: resource.id
+//             }
+//             Project_resources.add(pairData)
+//               .then(pair => {
+//                 res.status(201).json(resource)
+//               })
+//           })
+//       } else {
+//         res.status(404).json({ message: 'Could not find project with given id.' })
+//       }
+//     })
+//     .catch(err => {
+//       res.status(500).json({ message: 'Failed to create new step' });
+//     });
+// }); // needs fixing
 
 router.put('/:id', (req, res) => {
   const { id } = req.params;

@@ -7,7 +7,7 @@ module.exports = {
 }
 
 function add(pairData) {
-  return db("project_resources").insert({ pairData })
+  return db("project_resources").insert(pairData)
 }
 
 function removeUsingResource(id) {

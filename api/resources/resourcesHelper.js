@@ -20,13 +20,11 @@ function findById(id) {
 function findProjects(id) {
   return db.select("*")
     .from("projects")
-    .join("project_resources", "projects.id", "=", "project_resources.resource_id")
+    .join("project_resources", "projects.id", "=", "project_resources.project_id")
     .where("resource_id", "=", id)
 }
 
-
 function add(resourceData) {
-  console.log(resourceData)
   return db("resources").insert(resourceData)
 }
 

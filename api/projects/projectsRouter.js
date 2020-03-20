@@ -7,9 +7,6 @@ const Project_resources = require("../project_resources/project_resourcesHelper"
 
 const router = express.Router();
 
-// post resources with id needs to be fixed
-
-
 router.get('/', (req, res) => {
   Projects.find()
     .then(projects => {
@@ -130,35 +127,33 @@ router.post('/', (req, res) => {
 
 //checked until here
 
-router.post('/:id/resources', (req, res) => {
-  const resourceData = req.body;
-  const { id } = req.params;
+// router.post('/:id/resources', (req, res) => {
+//   const resourceData = req.body;
+//   const { id } = req.params;
 
-  Projects.findById(id)
-    .then(project => {
-      if (project) {
-        Resources.add(resourceData)
-          .then(id => {
-            // console.log(resource)
-            // Project_resources.add(pairData)
-            //   .then(pair => {
-            res.status(200).json(resource)
-          })
-          // .catch(err => {
-          //   res.status(500).json({ err, message: "failed to pair resource" })
-          // })
-          // })
-          .catch(err => {
-            res.status(500).json({ err, message: "failed to add resource" })
-          })
-      } else {
-        res.status(404).json({ message: 'Could not find project with given id.' })
-      }
-    })
-    .catch(err => {
-      res.status(500).json({ message: 'Failed to create new step' });
-    });
-}); // needs fixing
+//   Projects.findById(id)
+//     .then(project => {
+//       console.log(project, resourceData)
+//       if (project) {
+//         Resources.add(resourceData)
+//           .then(resource => {
+//             console.log(resource, id)
+//             Project_resources.add({ project_id: id, resource_id: resource })
+//               .then(pair => {
+//                 res.status(201).json(pair)
+//               })
+//               .catch(err => {
+//                 res.status(500).json({ err, message: "failed to pair" })
+//               })
+//           })
+//       } else {
+//         res.status(404).json({ message: 'Could not find project with given id.' })
+//       }
+//     })
+//     .catch(err => {
+//       res.status(500).json({ message: 'Failed to create new step' });
+//     });
+// });
 
 router.post('/:id/tasks', (req, res) => {
   const { id } = req.params;

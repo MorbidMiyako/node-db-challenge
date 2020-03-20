@@ -8,7 +8,6 @@ module.exports = {
   add,
   update,
   remove,
-  // completed
 }
 
 function find() {
@@ -21,8 +20,8 @@ function findById(id) {
 
 function findResources(id) {
   return db.select("*")
-    .from("resources")
-    .join("project_resources", "resources.id", "=", "project_resources.resource_id")
+    .from("resources as r")
+    .join("project_resources as pr", "r.id", "=", "pr.resource_id")
     .where("project_id", "=", id)
 }
 
